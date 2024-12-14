@@ -2,41 +2,34 @@
 
 #include "Resource.hpp"
 
-class ResourceManager {
-private:
-    Resource resource; // Obiekt typu Resource, którym zarządza ResourceManager
+class ResourceManager
+{
+    private:
+    std::unique_ptr<Resource> resource;// Wskaźnik do zasobu
 
-public:
-    // Konstruktor domyślny
-    ResourceManager() = default;
+    public:
+    ResourceManager() : resource(std::make_unique<Resource>()) {} // konstruktor domyślny - inicjalizuje zasób przy pomocy konstruktora Resource
 
-    // Konstruktor kopiujący
-    ResourceManager(const ResourceManager& other) : resource(other.resource) {}
-
-    // Konstruktor przenoszący
-    ResourceManager(ResourceManager&& other) noexcept : resource(std::move(other.resource)) {}
-
-    // Operator przypisania (kopiujący)
-    ResourceManager& operator=(const ResourceManager& other) {
-        if (this != &other) {
-            resource = other.resource;
-        }
-        return *this;
+    // Metoda get(), która wywołuje metodę get() obiektu Resource
+    double get() const {
+        return resource->get();
     }
 
-    // Operator przypisania (przenoszący)
+    // Domyślny konstruktor kopiujący i operator przypisania są usuwane, aby uniknąć kopiowania zasobu, który jest drogi w konstrukcji.
+    ResourceManager(const ResourceManager&) = delete;
+    ResourceManager& operator=(const ResourceManager&) = delete;
+
+    // Konstruktor przenoszący - przenosi zasób z obiektu innego ResourceManager
+    ResourceManager(ResourceManager&& other) noexcept 
+        : resource(std::move(other.resource)) {} // Przenosi zasób
+
+    // Operator przypisania przenoszącego - przenosi zasób z innego obiektu
     ResourceManager& operator=(ResourceManager&& other) noexcept {
-        if (this != &other) {
-            resource = std::move(other.resource);
+        if (this != &other) { 
+            resource = std::move(other.resource); // Przenosi zasób
         }
         return *this;
-    }
-
-    // Destruktor
-    ~ResourceManager() = default;
-
-    // Metoda, która zwraca wynik zawołania metody get obiektu Resource
-    double get() {
-        return resource.get();
     }
 };
+
+
