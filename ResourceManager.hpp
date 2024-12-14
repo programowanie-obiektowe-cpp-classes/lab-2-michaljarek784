@@ -15,21 +15,33 @@ class ResourceManager
         return resource->get();
     }
 
-    // Domyślny konstruktor kopiujący i operator przypisania są usuwane, aby uniknąć kopiowania zasobu, który jest drogi w konstrukcji.
-    ResourceManager(const ResourceManager&) = delete;
-    ResourceManager& operator=(const ResourceManager&) = delete;
+    // Konstruktor kopiujący - tworzy kopię zasobu
+    ResourceManager(const ResourceManager& other)
+        : resource(std::make_unique<Resource>(*other.resource)) {}
 
-    // Konstruktor przenoszący - przenosi zasób z obiektu innego ResourceManager
-    ResourceManager(ResourceManager&& other) noexcept 
-        : resource(std::move(other.resource)) {} // Przenosi zasób
-
-    // Operator przypisania przenoszącego - przenosi zasób z innego obiektu
-    ResourceManager& operator=(ResourceManager&& other) noexcept {
-        if (this != &other) { 
-            resource = std::move(other.resource); // Przenosi zasób
+    // Operator przypisania kopiującego - tworzy kopię zasobu
+    ResourceManager& operator=(const ResourceManager& other)
+    {
+        if (this != &other) {
+            resource = std::make_unique<Resource>(*other.resource);
         }
         return *this;
     }
+
+    // Konstruktor przenoszący - przenosi zasób
+    ResourceManager(ResourceManager&& other) noexcept
+        : resource(std::move(other.resource)) {}
+
+    // Operator przypisania przenoszącego - przenosi zasób
+    ResourceManager& operator=(ResourceManager&& other) noexcept {
+        if (this != &other) {
+            resource = std::move(other.resource);
+        }
+        return *this;
+    }
+
+    // Destruktor - std::unique_ptr automatycznie usuwa zasób
+    ~ResourceManager() = default;
 };
 
 
