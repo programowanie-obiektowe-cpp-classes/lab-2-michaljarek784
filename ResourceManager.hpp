@@ -2,25 +2,41 @@
 
 #include "Resource.hpp"
 
-class ResourceManager
-{
-    public:
-    private:
-    std::unique_ptr<Resource> resource;// Wskaźnik do zasobu
+class ResourceManager {
+private:
+    Resource resource; // Obiekt typu Resource, którym zarządza ResourceManager
 
-    public:
-    ResourceManager() : resource(std::make_unique<Resource>()) {} // konstruktor domyślny - inicjalizuje zasób przy pomocy konstruktora Resource
+public:
+    // Konstruktor domyślny
+    ResourceManager() = default;
 
-    // Metoda get(), która wywołuje metodę get() obiektu Resource
-    double get() const {
-        return resource->get();
+    // Konstruktor kopiujący
+    ResourceManager(const ResourceManager& other) : resource(other.resource) {}
+
+    // Konstruktor przenoszący
+    ResourceManager(ResourceManager&& other) noexcept : resource(std::move(other.resource)) {}
+
+    // Operator przypisania (kopiujący)
+    ResourceManager& operator=(const ResourceManager& other) {
+        if (this != &other) {
+            resource = other.resource;
+        }
+        return *this;
     }
 
-    // Domyślny konstruktor kopiujący i operator przypisania są usuwane, aby uniknąć kopiowania zasobu, który jest drogi w konstrukcji.
-    ResourceManager(const ResourceManager&) = delete;
-    ResourceManager& operator=(const ResourceManager&) = delete;
+    // Operator przypisania (przenoszący)
+    ResourceManager& operator=(ResourceManager&& other) noexcept {
+        if (this != &other) {
+            resource = std::move(other.resource);
+        }
+        return *this;
+    }
 
-    // Konstruktor przenoszący i operator przypisania przenoszącego
-    ResourceManager(ResourceManager&&) = default;
-    ResourceManager& operator=(ResourceManager&&) = default;
+    // Destruktor
+    ~ResourceManager() = default;
+
+    // Metoda, która zwraca wynik zawołania metody get obiektu Resource
+    double get() {
+        return resource.get();
+    }
 };
